@@ -8,6 +8,12 @@ pub mod git_store {
 pub mod local_working_copy {
     include!("local_working_copy.rs");
 }
+pub mod multi_backend_commit {
+    include!("multi_backend_commit.rs");
+}
+pub mod multi_backend_tree_ids {
+    include!("multi_backend_tree_ids.rs");
+}
 pub mod simple_op_store {
     include!("simple_op_store.rs");
 }

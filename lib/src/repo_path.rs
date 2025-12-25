@@ -821,6 +821,17 @@ impl<V> RepoPathTree<V> {
             Some((sub.entries.get(name)?, components.as_path()))
         })
     }
+
+    // TODO: actually have an iter here somehow:
+    // - The type of an impl Iterator varies by the tree depth, so impl trait cannot
+    //   be used.
+    // - A Box<dyn Iterator> didn't like taking the iterator for reasons I don't
+    //   get.
+    pub fn values<'a>(&'a self) -> Vec<&'a V> {
+        iter::once(&self.value)
+            .chain(self.entries.values().flat_map(|tree| tree.values()))
+            .collect()
+    }
 }
 
 impl<V: Debug> Debug for RepoPathTree<V> {

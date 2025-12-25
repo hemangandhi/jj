@@ -1,0 +1,16 @@
+
+syntax = "proto3";
+
+package multi_backend_tree_ids;
+
+message InnerBackendTreeId {
+  bytes tree_id = 1;
+  string path = 2;
+}
+
+message TreeIds {
+  int64 id = 1;
+
+  // Inner backend IDs.
+  repeated InnerBackendTreeId inner_trees = 2;
+}
