@@ -74,6 +74,7 @@ pub mod matchers;
 pub mod merge;
 pub mod merged_tree;
 pub mod merged_tree_builder;
+pub mod multi_backend;
 pub mod object_id;
 pub mod op_heads_store;
 pub mod op_store;
