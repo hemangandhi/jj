@@ -1,0 +1,9 @@
+
+syntax = "proto3";
+
+package multi_backend_paths;
+
+message MultiBackendPaths {
+  // Paths to inner backends.
+  map<string, string> repo_to_store_path_map = 1;
+}
