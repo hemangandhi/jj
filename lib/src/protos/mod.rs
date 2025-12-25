@@ -11,6 +11,15 @@ pub mod local_working_copy {
 pub mod secure_config {
     include!("secure_config.rs");
 }
+pub mod multi_backend_commit {
+    include!("multi_backend_commit.rs");
+}
+pub mod multi_backend_paths {
+    include!("multi_backend_paths.rs");
+}
+pub mod multi_backend_tree_ids {
+    include!("multi_backend_tree_ids.rs");
+}
 pub mod simple_op_store {
     include!("simple_op_store.rs");
 }

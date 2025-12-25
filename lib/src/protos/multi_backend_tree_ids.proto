@@ -1,0 +1,21 @@
+
+syntax = "proto3";
+
+package multi_backend_tree_ids;
+
+message InnerBackendTreeId {
+  bytes tree_id = 1;
+  string path = 2;
+  // Whether the sub-tree at the `tree_id` above is a tree in the multi-backend
+  // or in one of the encapsulated backends.
+  bool is_tree_multi_backend = 3;
+}
+
+message TreeIds {
+  bytes id = 1;
+
+  // Inner backend IDs.
+  repeated InnerBackendTreeId inner_trees = 2;
+
+  string root_path = 3;
+}

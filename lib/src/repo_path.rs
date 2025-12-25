@@ -318,6 +318,16 @@ impl RepoPathBuf {
     pub fn into_internal_string(self) -> String {
         self.value
     }
+
+    pub fn concat(&self, other: &RepoPathBuf) -> RepoPathBuf {
+        RepoPathBuf {
+            value: if self.value.is_empty() {
+                other.value.clone()
+            } else {
+                [self.value.clone(), "/".to_string(), other.value.clone()].concat()
+            },
+        }
+    }
 }
 
 impl RepoPath {
@@ -820,6 +830,27 @@ impl<V> RepoPathTree<V> {
             let name = components.next()?;
             Some((sub.entries.get(name)?, components.as_path()))
         })
+    }
+
+    // TODO: actually have an iter here somehow:
+    // - The type of an impl Iterator varies by the tree depth, so impl trait cannot
+    //   be used.
+    // - A Box<dyn Iterator> didn't like taking the iterator for reasons I don't
+    //   get.
+    pub fn values<'a>(&'a self) -> Vec<&'a V> {
+        iter::once(&self.value)
+            .chain(self.entries.values().flat_map(|tree| tree.values()))
+            .collect()
+    }
+
+    pub fn get_flat_path_map<'a>(&'a self, root_path: &RepoPathBuf) -> HashMap<RepoPathBuf, &'a V> {
+        iter::once((root_path.clone(), &self.value))
+            .chain(
+                self.entries.iter().flat_map(|(component, tree)| {
+                    tree.get_flat_path_map(&root_path.join(&component))
+                }),
+            )
+            .collect()
     }
 }
 
