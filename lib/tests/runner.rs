@@ -29,6 +29,7 @@ mod test_local_working_copy_executable_bit;
 mod test_local_working_copy_sparse;
 mod test_merge_trees;
 mod test_merged_tree;
+mod test_multi_backend;
 mod test_mut_repo;
 mod test_operations;
 mod test_refs;

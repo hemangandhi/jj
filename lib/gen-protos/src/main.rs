@@ -24,6 +24,9 @@ fn main() -> Result<()> {
         "simple_op_store.proto",
         "simple_store.proto",
         "simple_workspace_store.proto",
+        "multi_backend_commit.proto",
+        "multi_backend_tree_ids.proto",
+        "multi_backend_paths.proto",
     ];
 
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();

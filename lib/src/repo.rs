@@ -393,8 +393,9 @@ pub type IndexStoreInitializer<'a> =
 pub type SubmoduleStoreInitializer<'a> =
     dyn Fn(&UserSettings, &Path) -> Result<Box<dyn SubmoduleStore>, BackendInitError> + 'a;
 
-type BackendFactory =
-    Box<dyn Fn(&UserSettings, &Path) -> Result<Box<dyn Backend>, BackendLoadError>>;
+type BackendFactory = Box<
+    dyn Fn(&UserSettings, &Path, &StoreFactories) -> Result<Box<dyn Backend>, BackendLoadError>,
+>;
 type OpStoreFactory = Box<
     dyn Fn(&UserSettings, &Path, RootOperationData) -> Result<Box<dyn OpStore>, BackendLoadError>,
 >;
@@ -433,12 +434,14 @@ impl Default for StoreFactories {
         // Backends
         factories.add_backend(
             SimpleBackend::name(),
-            Box::new(|_settings, store_path| Ok(Box::new(SimpleBackend::load(store_path)))),
+            Box::new(|_settings, store_path, _store_factories| {
+                Ok(Box::new(SimpleBackend::load(store_path)))
+            }),
         );
         #[cfg(feature = "git")]
         factories.add_backend(
             crate::git_backend::GitBackend::name(),
-            Box::new(|settings, store_path| {
+            Box::new(|settings, store_path, _store_factories| {
                 Ok(Box::new(crate::git_backend::GitBackend::load(
                     settings, store_path,
                 )?))
@@ -447,9 +450,25 @@ impl Default for StoreFactories {
         #[cfg(feature = "testing")]
         factories.add_backend(
             crate::secret_backend::SecretBackend::name(),
-            Box::new(|settings, store_path| {
+            Box::new(|settings, store_path, _store_factories| {
                 Ok(Box::new(crate::secret_backend::SecretBackend::load(
                     settings, store_path,
+                )?))
+            }),
+        );
+        #[cfg(feature = "git")]
+        factories.add_backend(
+            crate::multi_backend::MultiBackend::name(),
+            Box::new(move |settings, store_path, store_factories| {
+                Ok(Box::new(crate::multi_backend::MultiBackend::load(
+                    settings,
+                    store_path,
+                    &|settings, path| {
+                        store_factories
+                            .load_backend(settings, path)
+                            .map(Arc::from)
+                            .map_err(|e| BackendLoadError(Box::new(e)))
+                    },
                 )?))
             }),
         );
@@ -548,7 +567,7 @@ impl StoreFactories {
                 store_type: backend_type.clone(),
             }
         })?;
-        Ok(backend_factory(settings, store_path)?)
+        Ok(backend_factory(settings, store_path, self)?)
     }
 
     pub fn add_op_store(&mut self, name: &str, factory: OpStoreFactory) {

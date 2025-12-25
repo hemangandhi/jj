@@ -197,11 +197,13 @@ impl TestEnvironment {
         let mut factories = StoreFactories::default();
         factories.add_backend("test", {
             let factory = self.test_backend_factory.clone();
-            Box::new(move |_settings, store_path| Ok(Box::new(factory.load(store_path))))
+            Box::new(move |_settings, store_path, _store_factories| {
+                Ok(Box::new(factory.load(store_path)))
+            })
         });
         factories.add_backend(
             SecretBackend::name(),
-            Box::new(|settings, store_path| {
+            Box::new(|settings, store_path, _store_factories| {
                 Ok(Box::new(SecretBackend::load(settings, store_path)?))
             }),
         );

@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package multi_backend_commit;
+
+// A representation of the state of an inner-backend -- a backend that's a part of the multi-backend.
+message InnerBackendCommit {
+  // The commit ID of the inner backend.
+  bytes commit_id = 1;
+  // The path to the inner backend.
+  string path = 2;
+  // Whether the repo or backend at this path is already deleted.
+  bool deleted = 3;
+}
+
+message LabeledMergeTrees {
+  bytes tree_id = 1;
+  string conflict_label = 2;
+}
+
+message Timestamp {
+  int64 millis_since_epoch = 1;
+  int32 tz_offset = 2;
+}
+
+message Commit {
+  // The current commit's ID.
+  bytes id = 1;
+  // The commit IDs from all the member backends.
+  repeated InnerBackendCommit inner_backend_commits = 2;
+  // The parent commits.
+  repeated bytes parent_ids = 3;
+  // The ancestral commits.
+  repeated bytes predecessor_ids = 4;
+
+  string description = 5;
+
+  string author_name = 6;
+  string author_email = 7;
+  Timestamp author_timestamp = 8;
+
+  string committer_name = 9;
+  string committer_email = 10;
+  Timestamp committer_timestamp = 11;
+
+  // TODO: does this really work? One change ID to many commits?
+  bytes change_id = 12;
+
+  repeated LabeledMergeTrees merge_data = 13;
+}
