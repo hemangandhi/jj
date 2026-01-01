@@ -38,6 +38,8 @@ mod help;
 mod interdiff;
 mod log;
 mod metaedit;
+#[cfg(feature = "git")]
+mod multi_repo;
 mod new;
 mod next;
 mod operation;
@@ -128,6 +130,9 @@ enum Command {
     Interdiff(interdiff::InterdiffArgs),
     Log(log::LogArgs),
     Metaedit(metaedit::MetaeditArgs),
+    #[cfg(feature = "git")]
+    #[command(subcommand)]
+    MultiRepo(multi_repo::MultiRepoCommand),
     New(new::NewArgs),
     Next(next::NextArgs),
     #[command(subcommand)]
@@ -197,6 +202,7 @@ pub fn run_command(ui: &mut Ui, command_helper: &CommandHelper) -> Result<(), Co
         Command::Interdiff(args) => interdiff::cmd_interdiff(ui, command_helper, args),
         Command::Log(args) => log::cmd_log(ui, command_helper, args),
         Command::Metaedit(args) => metaedit::cmd_metaedit(ui, command_helper, args),
+        Command::MultiRepo(args) => multi_repo::cmd_git(ui, command_helper, args),
         Command::New(args) => new::cmd_new(ui, command_helper, args),
         Command::Next(args) => next::cmd_next(ui, command_helper, args),
         Command::Operation(args) => operation::cmd_operation(ui, command_helper, args),
